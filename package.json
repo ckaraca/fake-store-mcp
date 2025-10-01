@@ -1,0 +1,49 @@
+{
+  "name": "fake-store-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Fake Store API - E-commerce data integration for Claude AI",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "fake-store-api",
+    "ecommerce",
+    "typescript",
+    "ai-tools"
+  ],
+  "author": "ckaraca",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ckaraca/fake-store-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ckaraca/fake-store-mcp/issues"
+  },
+  "homepage": "https://github.com/ckaraca/fake-store-mcp#readme",
+  "type": "module",
+  "bin": {
+    "fake-store-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.0",
+    "zod-to-json-schema": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
