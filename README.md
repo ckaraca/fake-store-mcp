@@ -53,6 +53,18 @@ Add the following configuration:
 {
   "mcpServers": {
     "fake-store": {
+      "command": "npx",
+      "args": ["-y", "fake-store-mcp"]
+    }
+  }
+}
+```
+
+**Alternative (if installed globally):**
+```json
+{
+  "mcpServers": {
+    "fake-store": {
       "command": "fake-store-mcp"
     }
   }
