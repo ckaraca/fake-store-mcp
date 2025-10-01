@@ -65,6 +65,28 @@ function buildQueryString(options?: ListOptions): string {
 }
 
 /**
+ * Known valid categories from Fake Store API
+ * This list provides SSRF protection by validating category inputs
+ */
+const VALID_CATEGORIES = [
+  'electronics',
+  'jewelery',
+  'men\'s clothing',
+  'women\'s clothing'
+] as const;
+
+/**
+ * Validate category to prevent SSRF attacks
+ */
+function validateCategory(category: string): void {
+  if (!VALID_CATEGORIES.includes(category as any)) {
+    throw new Error(
+      `Invalid category: "${category}". Valid categories are: ${VALID_CATEGORIES.join(', ')}`
+    );
+  }
+}
+
+/**
  * Products API
  */
 export async function getAllProducts(
@@ -86,6 +108,9 @@ export async function getProductsByCategory(
   category: string,
   options?: ListOptions
 ): Promise<Product[]> {
+  // Validate category to prevent SSRF
+  validateCategory(category);
+
   const query = buildQueryString(options);
   return fetchWithRetry<Product[]>(
     `${BASE_URL}/products/category/${encodeURIComponent(category)}${query}`

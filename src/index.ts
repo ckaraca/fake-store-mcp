@@ -54,8 +54,13 @@ class FakeStoreMcpServer {
 
     this.setupToolHandlers();
 
-    // Error handling
-    this.server.onerror = (error) => console.error('[MCP Error]', error);
+    // Error handling - sanitized logging
+    this.server.onerror = (error) => {
+      console.error('[MCP Error]', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+    };
     process.on('SIGINT', async () => {
       await this.server.close();
       process.exit(0);
@@ -130,28 +135,44 @@ class FakeStoreMcpServer {
       try {
         switch (name) {
           // Products
-          case 'list_products':
-            return await listProducts(args || {});
-          case 'get_product':
-            return await getProduct(args as any);
+          case 'list_products': {
+            const validatedArgs = listProductsSchema.parse(args || {});
+            return await listProducts(validatedArgs);
+          }
+          case 'get_product': {
+            const validatedArgs = getProductSchema.parse(args);
+            return await getProduct(validatedArgs);
+          }
           case 'list_categories':
             return await listCategories();
-          case 'get_products_by_category':
-            return await getProductsByCategoryTool(args as any);
+          case 'get_products_by_category': {
+            const validatedArgs = getProductsByCategorySchema.parse(args);
+            return await getProductsByCategoryTool(validatedArgs);
+          }
 
           // Carts
-          case 'list_carts':
-            return await listCarts(args || {});
-          case 'get_cart':
-            return await getCart(args as any);
-          case 'get_user_carts':
-            return await getUserCartsTool(args as any);
+          case 'list_carts': {
+            const validatedArgs = listCartsSchema.parse(args || {});
+            return await listCarts(validatedArgs);
+          }
+          case 'get_cart': {
+            const validatedArgs = getCartSchema.parse(args);
+            return await getCart(validatedArgs);
+          }
+          case 'get_user_carts': {
+            const validatedArgs = getUserCartsSchema.parse(args);
+            return await getUserCartsTool(validatedArgs);
+          }
 
           // Users
-          case 'list_users':
-            return await listUsers(args || {});
-          case 'get_user':
-            return await getUser(args as any);
+          case 'list_users': {
+            const validatedArgs = listUsersSchema.parse(args || {});
+            return await listUsers(validatedArgs);
+          }
+          case 'get_user': {
+            const validatedArgs = getUserSchema.parse(args);
+            return await getUser(validatedArgs);
+          }
 
           default:
             return {
@@ -165,11 +186,21 @@ class FakeStoreMcpServer {
             };
         }
       } catch (error) {
+        // Sanitize error message to avoid information disclosure
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+
+        // Log full error internally for debugging
+        console.error('[Tool Execution Error]', {
+          tool: name,
+          error: errorMessage,
+          timestamp: new Date().toISOString()
+        });
+
         return {
           content: [
             {
               type: 'text' as const,
-              text: `Error executing ${name}: ${error instanceof Error ? error.message : String(error)}`,
+              text: `Error executing ${name}: ${errorMessage}`,
             },
           ],
           isError: true,
